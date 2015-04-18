@@ -1,0 +1,88 @@
+program lorenz                  
+use gnuplot_fortran
+implicit none
+
+!real, parameter :: sigma=10,rho=29,rho2=35, beta=8.0/3, dt=4.0E-2,epsilon=2.85,maxT=20
+real, parameter :: sigma=10,rho=29,rho2=35, beta=8.0/3, gamma=20.0 , delta=5.0 ,dt=4.0E-2,epsilon=2.85,maxT=20
+integer, parameter :: maxI = maxT/dt, snakeSize=10
+integer :: i,j
+real :: relativeDistance,t
+
+real, dimension(3) :: x0 = (/ 0.8, 0.3068, 7.0 /)
+real, dimension(maxI,3) :: xp,yp,yf = reshape( (/ (40,i=1,3*maxI) /), (/ maxI, 3 /) )
+real, dimension (3) :: x,xc,k1,k2,k3,k4
+real, dimension (3) :: y,yc,m1,m2,m3,m4
+
+
+call startPlot()
+
+call setXrange(0.0,50.0)
+call setYrange(0.0,50.0)
+call setZrange(0.0,50.0)
+
+i=0
+j=0
+t=0
+do while (t<maxT) !i<3000)
+   ! j=j+1
+   ! if(mod(j,1)==0) then
+   !    j=0
+      xp(i,:)=xc
+      ! if(i>snakeSize) then
+      !      call nextPlot3d(xp(i-snakeSize:i,1),xp(i-snakeSize:i,2),xp(i-snakeSize:i,3))
+      ! end if
+      call nextPlot3d(xp(:i,1),xp(:i,2),xp(:i,3))
+      i=i+1
+      !write(*,*) "Gla"
+
+   ! end if
+
+   t=t+dt
+   k1=xDot(x0)
+   k2=xDot(x0 + 0.5*dt*k1)
+   k3=xDot(x0 + 0.5*dt*k2)
+   k4=xDot(x0 + dt*k3)
+   xc = x0 + dt*(1.0/6)*(k1+2*k2+2*k3+k4)
+   !xc=x0 + xDot(x0)*dt
+   x0=xc
+
+   k1=xDot(x0)
+   k2=xDot(x0 + 0.5*dt*k1)
+   k3=xDot(x0 + 0.5*dt*k2)
+   k4=xDot(x0 + dt*k3)
+   xc = x0 + dt*(1.0/6)*(k1+2*k2+2*k3+k4)
+   !xc=x0 + xDot(x0)*dt
+   x0=xc
+
+
+end do
+
+
+call endPlot()
+call system("xdg-open result3d.avi")
+
+
+! type vector
+!    real, dimension(3) :: x
+! end type vector
+
+!type vector q
+contains
+  function xDot(x)
+    real, dimension(3)::xDot,x
+    xDot(1)=sigma*(x(2)-x(1))
+    xDot(2)=rho*x(1) - x(2) - gamma*x(1)*x(3)
+    !xDot(2)=(x(1)*(rho-x(3))) - x(2)
+    xDot(3)=(delta*x(1)*x(2)) - (beta*x(3))
+  end function xDot
+
+  function yDot(y)
+    real, dimension(3)::yDot,y
+    yDot(1)=sigma*(x(2)-x(1))
+    yDot(2)=rho*x(1) - x(2) - gamma*x(1)*x(3)
+    !xDot(2)=(x(1)*(rho-x(3))) - x(2)
+    yDot(3)=(delta*x(1)*x(2)) - (beta*x(3))
+  end function yDot
+
+
+end program lorenz

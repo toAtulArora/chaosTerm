@@ -1,10 +1,15 @@
 program lorenz
+use gnuplot_fortran
+implicit none
 !chaoticatmospheres.deviantart.com/art/Strange-Attractors-The-Coupled-Lorenz-Attractor-376065911
 
-  real, parameter :: sigma=10, rho1=29, rho2=35, beta=8.0/3,dt=1.0E-3,epsilon=2.85
+  real, parameter :: sigma=10, rho1=29, rho2=35, beta=8.0/3,dt=1.0E-3,epsilon=2.85,maxT=10
+  integer, parameter:: maxI=maxT/dt, snakeSize=100
+  integer :: i,j
   real :: relativeDistance
   ! real :: x=0.008,y=0.103068,z=7,t
-  real :: xO=0.008,yO=0.103068,zO=7.0,t
+  real :: xO=0.8,yO=0.3068,zO=7.0,t
+  real, dimension(maxI) :: xp,yp,zp
   real :: x,y,z
 
   ! real :: x1,y1,z1
@@ -15,8 +20,26 @@ program lorenz
   !real :: x2o,y2o,z2o
 
   logical :: yoyoSucks=.true.
+  call startPlot()
   !write(*,*) "Yoyo sucks :("
-  do while (t<100)
+  call setXrange(0.0,50.0)
+  call setYrange(0.0,50.0)
+  call setZrange(0.0,50.0)
+
+  i=0
+  j=0
+  do while (i<1000)!t<maxT)
+     j=j+1
+     if(mod(j,10)==0) then
+        j=0
+        xp(i)=x
+        yp(i)=y
+        zp(i)=z
+        i=i+1
+        if(i>snakeSize) then
+           call nextPlot3d(xp(i-snakeSize:i),yp(i-snakeSize:i),zp(i-snakeSize:i))
+        end if
+     end if
      t=t+dt
      x=xO + xDot(xO,yO,zO)*dt
      y=yO + yDot(xO,yO,zO,rho1)*dt
@@ -42,6 +65,10 @@ program lorenz
         yoyoSucks=.true.
      end if
   end do
+
+  call endPlot()
+  call system("xdg-open result3d.avi")
+
 
 contains
   function xDotCoupled(x,y,z,x2)

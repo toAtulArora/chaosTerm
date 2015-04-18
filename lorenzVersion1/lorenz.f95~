@@ -16,7 +16,7 @@ program lorenz
 
   logical :: yoyoSucks=.true.
   !write(*,*) "Yoyo sucks :("
-  do while (t<100)
+  do while (t<1000)
      t=t+dt
      x=xO + xDot(xO,yO,zO)*dt
      y=yO + yDot(xO,yO,zO,rho1)*dt
