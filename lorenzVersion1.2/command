@@ -1,3 +1,3 @@
- set terminal jpeg
- set output 'temp2d/file0500.jpeg'
+ set terminal pdf
+ set output 'temp2d/dimension.pdf'
  plot 'tempData.dat' w lp
